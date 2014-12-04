@@ -1,0 +1,63 @@
+<div>
+  <div>
+    <style>
+    #progress_bar {
+      width: 200px;
+      margin: 10px 0;
+      padding: 3px;
+      border: 1px solid #000;
+      font-size: 14px;
+      clear: both;
+      opacity: 0;
+      -moz-transition: opacity 1s linear;
+      -o-transition: opacity 1s linear;
+      -webkit-transition: opacity 1s linear;
+    }
+    #progress_bar.loading {
+      opacity: 1.0;
+    }
+    #progress_bar .percent {
+      background-color: #99ccff;
+      height: auto;
+      width: 0;
+    }
+    </style>
+    <table class="table table-hover" ng-show="binding.length>0">
+      <tr ng-repeat="document in binding| filter:isDeleted" >
+        <td>
+          <a ng-href="#" ng-click="openAttachment(document)">{{document.name}}</a>
+        </td>
+        <td style="text-align:end;white-space:nowrap">
+          <a title="Remove" class="btn btn-default" ng-click="remove(document)"><i class="glyphicon glyphicon-trash"></i></a>
+        </td>
+      </tr>
+    </table>
+
+    <div id="fileUploadBar">
+
+      <div class="alert alert-error" ng-show="editor.error!=null">
+        <h4>Error occured</h4>
+          {{editor.error}}
+      </div>
+
+      <div ng-show="editor.progress">{{editor.progress}}
+          <div ng-show="editor.progress.style=='active'">
+            <label>{{editor.name}} ({{editor.progress.size/1024 | number:1}} kB)</label>blaise fonseca
+            <div class="progress progress-striped {{editor.progress.style}}">
+              <div class="progress-bar"  role="progressbar" aria-valuenow="{{editor.progress.percent}}"
+              aria-valuemin="0" aria-valuemax="100" style="width: {{editor.progress.percent}}%">
+                <span class="sr-only">{{editor.progress.percent}}% Complete</span>
+              </div>
+            </div>
+          </div>
+          <div ng-show="editor.progress.style=='complete'">
+            <label class="control-label" required>Filename</label>
+            <input type="text" readonly style="width:98%" value="{{editor.name}} ({{editor.progress.size/1024 | number:1}} kB)">
+          </div>
+      </div>
+      <div id="uploadPlaceholder" style="display:none"></div>
+      <button class="btn btn-default" ng-click="addFile()" ><i class="glyphicon glyphicon-file"></i> Add file</button>
+    </div>
+  </div>
+
+</div>

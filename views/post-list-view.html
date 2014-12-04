@@ -1,0 +1,31 @@
+<div ng-controller="forumPostController">
+
+  <div class="container">
+    <br/>
+    <br/>
+    <div >
+      <div class="row">
+        <div class="col-lg-12 well">
+          <div forum-id="17384" thread-id="threadId" show-details="true" type="thread" forum-details></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-12">
+          <div id="successMsg" style="display:none" class="alert alert-success alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert">
+              <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+            </button>
+            Post updated successfully.</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-12">
+          <div posts  forum-id="17384"/>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- <div forum-login ng-show="!isUserAuthenticated()" /> -->
+</div>
