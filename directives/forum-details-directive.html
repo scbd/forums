@@ -17,8 +17,8 @@
           Please wait while our trained monkeys prepare the details for you. <i class="fa fa-spinner fa-spin"/>
       </span>
       <span ng-show="forum"><h1>Welcome to {{forum.title|lstring}}</h1></span>
-      <span>
-        <a ng-href="/forums/iac?forumid={{forum.forumID}}" >Back to thread list</a>
+      <span ng-hide="type=='forum'">
+        <a ng-href="{{forumListUrl}}?forumid={{forum.forumID}}" >Back to thread list</a>
       </span>
     </div>
   </div>
@@ -32,10 +32,12 @@
   </div>
 </br>
   <div class="row">
-    <div class="col-sm-2">
+    <div class="col-sm-8">      
+    </div>
+    <div class="col-sm-1">
       <div forum-post ng-show="forum.userCanPost && type=='forum'" forum-id="forum.forumID" type="thread" title="Add new thread" />
     </div>
-    <div class="col-sm-10">
+    <div class="col-sm-3">
       <button type="button" class="btn btn-primary" ng-show="forumWatch.watch || threadWatch.watch" ng-click="stopWatching()">Stop watching {{type}}
       </button>
       <button type="button" class="btn btn-primary" ng-show="(forumWatch && !forumWatch.watch) || (threadWatch && !threadWatch.watch)" ng-click="startWatching()">Watch {{type}}

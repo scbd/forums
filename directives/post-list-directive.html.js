@@ -5,7 +5,7 @@ define(['app', './forum-post-directive.html.js', '../js/common.js', '../js/forum
 
     return {
       restrict: "EAC",
-      templateUrl: '/directives/post-list-directive.html',
+      templateUrl: '/app/views/forums/directives/post-list-directive.html',
       replace: true,
       transclude: false,
       scope: {
@@ -32,7 +32,7 @@ define(['app', './forum-post-directive.html.js', '../js/common.js', '../js/forum
 
               if ($location.$$hash) {
                 $timeout(function() {
-                  var postTop = $element.find('#post_' + $location.$$hash).offset().top - 50;
+                  var postTop = $('#post_' + $location.$$hash).offset().top - 50;
                   $("body, html").animate({
                     scrollTop: postTop
                   }, "slow");

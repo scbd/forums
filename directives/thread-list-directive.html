@@ -20,7 +20,7 @@
 
         <div class="row">
           <div class="col-lg-6">
-            <a ng-href="/forums/iac/{{thread.threadID}}">{{thread.subject|lstring:locale | limitTo:100}}</a>
+            <a ng-href="{{postUrl}}/{{thread.threadID}}?forumid={{thread.forumID}}">{{thread.subject|lstring:locale | limitTo:100}}</a>
             <div>posted by {{thread.createdBy}} on {{thread.createdOn| date:'medium'}}</div>
           </div>
           <div class="col-lg-1">

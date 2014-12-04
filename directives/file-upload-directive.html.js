@@ -4,7 +4,7 @@ app.directive('kmUpload', function ( $q)
 {
   return {
     restrict: 'EAC',
-    templateUrl: '/directives/file-upload-directive.html',
+    templateUrl: '/app/views/forums/directives/file-upload-directive.html',
     replace: true,
     transclude: false,
     scope: {

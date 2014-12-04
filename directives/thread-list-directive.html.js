@@ -5,11 +5,12 @@ define(['app', '../js/forum-http-factory.js'], function(app) {
 
     return {
       restrict: "EAC",
-      templateUrl: '/directives/thread-list-directive.html',
+      templateUrl: '/app/views/forums/directives/thread-list-directive.html',
       replace: true,
       transclude: false,
       scope: {
-        forumId: "@forumId"
+        forumId: "@forumId",
+        postUrl: "@postUrl"
       },
       link: function($scope, $element, $attrs) {
 
@@ -27,9 +28,10 @@ define(['app', '../js/forum-http-factory.js'], function(app) {
             $scope.error = "Forum id not specified.";
             return;
           }
-          if ($scope.forumId && $scope.threadId)
-            $location.path('/forums/iac/' + $scope.threadId)
-
+          if ($scope.forumId && $scope.threadId) {
+            $location.path('/forums/iac/' + $scope.threadId);
+            return;
+          }
           var forumThreads = $http.get('/api/v2014/discussions/forums/' + $scope.forumId + '/threads');
 
           $q.when(forumThreads).then(function(response) {
@@ -74,7 +76,7 @@ define(['app', '../js/forum-http-factory.js'], function(app) {
                 $scope.success = 'deleted';
                 $element.find('#msg').show('slow');
 
-                $scope.threads.splice($scope.threads.indexOf($scope.threadtodelete),1);
+                $scope.threads.splice($scope.threads.indexOf($scope.threadtodelete), 1);
                 modalDelete.modal("hide");
                 $scope.threadtodelete = null;
 

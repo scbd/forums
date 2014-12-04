@@ -7,7 +7,7 @@ define(['app', '../js/forum-http-factory.js',
 
     return {
       restrict: "EA",
-      templateUrl: '/directives/forum-post-directive.html',
+      templateUrl: '/app/views/forums/directives/forum-post-directive.html',
       replace: true,
       transclude: false,
       scope: {
@@ -225,7 +225,7 @@ define(['app', '../js/forum-http-factory.js',
           $scope.scrollToPost = function(postId) {
             // if($location.$$hash)
             //   $location.$$hash = postId
-            var postTop = $element.parent().parent().find('#post_' + postId).offset().top - 50;
+            var postTop = $('#post_' + postId).offset().top - 50;
             $("body, html").animate({
               scrollTop: postTop
             }, "slow");

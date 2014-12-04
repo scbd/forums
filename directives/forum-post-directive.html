@@ -10,10 +10,10 @@
       </table>
   </div>
   <!-- <hr  style="margin-top: 5px; margin-bottom: 0px;"/> -->
-  <div class="row" style="padding-top:5px;border-top: 1px solid #ddd;" ng-show="type=='post'">
+  <div class="row" ng-show="type=='post'">
       <div class="col-sm-10">
           <!-- <div class="well1" style="padding-top: 5px;min-height: 50px;"> -->
-              <div class="pull-left1" style="font-weight:bold">posted by {{post.createdBy}} on   {{post.createdOn}}
+              <div class="pull-left1" style="font-weight:bold">posted by {{post.createdBy}} on   {{post.createdOn| date:'medium'}}
               </div><br/>
               <span ng-show="post.parentID!=post.forumPostID">
                 in response to: <span ng-click="scrollToPost(post.parentID)" style="cursor:pointer;text-decoration: underline;color: #428bca;">#{{post.parentID}}</a>

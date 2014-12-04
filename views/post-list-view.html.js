@@ -1,6 +1,12 @@
 define(['app', '../directives/forum-details-directive.html.js', '../directives/post-list-directive.html.js'], function(app) {
 
-  app.controller("forumPostController", ["$scope", function($scope ) {
+  app.controller("forumPostController", ["$scope", "$location", function($scope,  $location ) {
+
+
+    if ($location.search().forumid) {
+      $scope.forumId = $location.search().forumid;
+    }
+
 
     function addPost(data, PostCollection) {
       PostCollection.push({

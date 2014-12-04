@@ -4,14 +4,15 @@ app.directive("forumDetails", [ function () {
 
   return {
     restrict   : "EA",
-    templateUrl: '/directives/forum-details-directive.html',
+    templateUrl: '/app/views/forums/directives/forum-details-directive.html',
     replace    : true,
     transclude : false,
     scope   : {
       forumId     : "=forumId",
       threadId    : "=threadId",
       showDetails : "@showDetails",
-      type        : "@type"
+      type        : "@type",
+      forumListUrl: "@forumListUrl"
     },
     link : function($scope, $element, $attrs) {
 
@@ -19,35 +20,46 @@ app.directive("forumDetails", [ function () {
     controller : ["$scope", "forumHttp", "underscore", "$q",'$element',
      function ($scope, $http, _ ,$q, $element)
     {
-      if($scope.showDetails){
-        $scope.forumWatch = null;
-        var forum =  $http.get('/api/v2014/discussions/forums/' + $scope.forumId);
 
-        var forumWatchQuery =  $http.get('/api/v2014/discussions/forums/' + $scope.forumId + '/watch');
-        var threadWatchQuery =  $http.get('/api/v2014/discussions/threads/' + $scope.threadId + '/watch');
+      function loadForum(){
+          if($scope.showDetails && (!$scope.forum || $scope.forum.forumId != $scope.forumId)){
+            $scope.forumWatch = null;
+            var forum =  $http.get('/api/v2014/discussions/forums/' + $scope.forumId);
 
-        $q.all([forum,  forumWatchQuery]).then(function(result){
+            var forumWatchQuery =  $http.get('/api/v2014/discussions/forums/' + $scope.forumId + '/watch');
+            var threadWatchQuery =  $http.get('/api/v2014/discussions/threads/' + $scope.threadId + '/watch');
 
-            $scope.forum = result[0].data;
-            console.log(result[1]);
-            //if user is not watching forum check if watching thread.
-            if(result[1].data.watch || $scope.type == 'forum'){
-              if($scope.type != 'thread')
-                $scope.forumWatch = result[1].data
-            }
-            else{
-              console.log('thread query')
-              $q.when(threadWatchQuery).then(function(result){
-                $scope.threadWatch = result.data;
-              });
-            }
+            $q.all([forum,  forumWatchQuery]).then(function(result){
 
-        }).catch(function(e){
-          console.log(e);
-        }).finally(function(){
-          $scope.isLoadingDocument = null;
-        });
+                $scope.forum = result[0].data;
+                console.log(result[1]);
+                //if user is not watching forum check if watching thread.
+                if(result[1].data.watch || $scope.type == 'forum'){
+                  if($scope.type != 'thread')
+                    $scope.forumWatch = result[1].data
+                }
+                else{
+                  console.log('thread query')
+                  $q.when(threadWatchQuery).then(function(result){
+                    $scope.threadWatch = result.data;
+                  });
+                }
+
+            }).catch(function(e){
+              console.log(e);
+            }).finally(function(){
+              $scope.isLoadingDocument = null;
+            });
+          }
+
       }
+
+
+      $scope.$watch('forumId', function(newValue, oldValue){
+        console.log(newValue, oldValue);
+        if(newValue)
+          loadForum();
+      })
 
       $scope.$on("showSuccessMessage", function(evt, data) {
         // if (data && data.action == 'new') {
