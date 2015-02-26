@@ -5,12 +5,12 @@ define(['app', '../js/forum-http-factory.js'], function(app) {
 
     return {
       restrict: "EAC",
-      templateUrl: '/app/views/forums/directives/thread-list-directive.html',
+      templateUrl: '/cbd-forums/directives/thread-list-directive.html',
       replace: true,
       transclude: false,
       scope: {
-        forumId: "@forumId",
-        postUrl: "@postUrl"
+        forumId: "=forumId",
+        postUrl: "=postUrl"
       },
       link: function($scope, $element, $attrs) {
 
@@ -32,6 +32,7 @@ define(['app', '../js/forum-http-factory.js'], function(app) {
             $location.path('/forums/iac/' + $scope.threadId);
             return;
           }
+
           var forumThreads = $http.get('/api/v2014/discussions/forums/' + $scope.forumId + '/threads');
 
           $q.when(forumThreads).then(function(response) {
@@ -39,13 +40,7 @@ define(['app', '../js/forum-http-factory.js'], function(app) {
             $scope.threads = response.data;
 
           }).catch(function(error) {
-
-            if (error.status == 403 || error.status == 401 || error.status == 400 || error.data.message || error.data.Message)
-              $scope.error = (error.data.code ? (error.data.code + ': ') : '') + (error.data.message || error.data.Message);
-            else
-              $scope.error = "There was a error, please try again.";
-
-            $element.find('#msg').show('slow');
+              handleError(error, 'list');
           });
 
           $scope.$on("threadCreated", function(evt, data) {
@@ -71,7 +66,7 @@ define(['app', '../js/forum-http-factory.js'], function(app) {
 
             $scope.loading = true;
             $scope.errorMsg = '';
-            $http.delete('/api/v2014/discussions/threads/' + $scope.threadtodelete.threadID)
+            $http.delete('/api/v2014/discussions/threads/' + $scope.threadtodelete.threadId)
               .then(function(data) {
                 $scope.success = 'deleted';
                 $element.find('#msg').show('slow');
@@ -82,14 +77,19 @@ define(['app', '../js/forum-http-factory.js'], function(app) {
 
 
               }).catch(function(error) {
-                if (error.status == 403 || error.status == 401 || error.status == 400 || error.data.message || error.data.Message)
-                  $scope.errorMsg = 'Cannot delete, ' + (error.data.code ? (error.data.code + ': ') : '') + (error.data.message || error.data.Message);
-                else
-                  $scope.errorMsg = "There was a error, please try again.";
+                handleError(error, 'delete');
                 console.log(error);
               }).finally(function() {
                 $scope.loading = false;
               })
+          }
+
+          function handleError(error, type){
+            if (error.status == 403 || error.status == 401 || error.status == 400 || error.data.message || error.data.Message)
+              $scope.error = 'Cannot ' + type + ', ' + (error.data.code ? (error.data.code + ': ') : '') + (error.data.message || error.data.Message);
+            else
+              $scope.error = "There was a error, please try again.";
+            $element.find('#msg').show('slow');
           }
         }
       ]

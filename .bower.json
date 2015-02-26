@@ -1,0 +1,33 @@
+{
+  "name": "cbd-forums",
+  "homepage": "https://github.com/scbd/forums",
+  "authors": [
+    "Blaise Fonseca <blaise.fonseca@cbd.int>"
+  ],
+  "description": "forum components for SCBD",
+  "license": "MIT",
+  "private": false,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "~1.2.18",
+    "jquery": "~2.0.3",
+    "bootstrap": "~3.1",
+    "underscore": "~1.7.0"
+  },
+  "_release": "fa93e92cf3",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "fa93e92cf353dda2f24d4577973c093a0707e078"
+  },
+  "_source": "git://github.com/scbd/forums.git",
+  "_target": "*",
+  "_originalSource": "cbd-forums",
+  "_direct": true
+}

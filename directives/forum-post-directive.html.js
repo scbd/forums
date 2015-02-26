@@ -7,7 +7,7 @@ define(['app', '../js/forum-http-factory.js',
 
     return {
       restrict: "EA",
-      templateUrl: '/app/views/forums/directives/forum-post-directive.html',
+      templateUrl: '/cbd-forums/directives/forum-post-directive.html',
       replace: true,
       transclude: false,
       scope: {
@@ -38,33 +38,14 @@ define(['app', '../js/forum-http-factory.js',
             modalEdit.modal("show");
           }
 
-          $scope.openAttachment = function(attachment) {
-            var date = new Date();
-            date.setTime(date.getTime() + (30 * 1000));
-            var expires = "; expires=" + date.toGMTString();
 
-            document.cookie = "File-AUTH" + "=" + $browser.cookies().authenticationToken + expires + "; path=/";
-
-            // if(!attachment || $scope.isLoadingDocument == attachment.forumAttachmentID)
-            //   return;
-            // $scope.isLoadingDocument = attachment.forumAttachmentID;
-            // $http.get('/api/v2014/discussions/attachments/' + attachment.forumAttachmentID).then(function(result){
-            //
-            //   window.open(result.data.URL, '_blank');
-            //
-            // }).catch(function(e){
-            //   console.log(e);
-            // }).finally(function(){
-            //   $scope.isLoadingDocument = null;
-            // });
-
-          }
 
           function createThread() {
 
 
             $scope.unsafePost.forumId = $scope.forumId;
 
+            $scope.loading = true;
             $http.post('/api/v2014/discussions/forums/' + $scope.forumId + '/threads', $scope.unsafePost)
               .then(function(data) {
 
@@ -78,7 +59,9 @@ define(['app', '../js/forum-http-factory.js',
 
               }).catch(function(error) {
                 showError(error, 'create');
-              })
+              }).finally(function(){
+                  $scope.loading = false;
+              });
 
           }
 
@@ -107,6 +90,7 @@ define(['app', '../js/forum-http-factory.js',
               $scope.unsafePost.parentID = $scope.postId;
               $scope.unsafePost.threadID = $scope.threadId;
 
+              $scope.loading = true;
               $http.post('/api/v2014/discussions/threads/' + $scope.postId + '/posts', $scope.unsafePost)
                 .then(function(data) {
 
@@ -114,14 +98,16 @@ define(['app', '../js/forum-http-factory.js',
                     action: 'new',
                     post: data.data
                   });
-                  $scope.post = data.data;
+                  //$scope.post = data.data;
                   modalEdit.modal("hide");
 
                 }).catch(function(error) {
 
                   showError(error, 'create');
                   console.log(error);
-                })
+                }).finally(function(){
+                    $scope.loading = false;
+                });
             }
           }
 
@@ -129,7 +115,7 @@ define(['app', '../js/forum-http-factory.js',
             $scope.errorMsg = '';
             $scope.operation = 'edit'
             $scope.unsafePost = _.clone($scope.post);
-            $scope.unsafePost.message.en = $scope.post.message.en.replace(/<br\s*\/?>/mg, "\n");
+            $scope.unsafePost.message.en = $scope.post.message.replace(/<br\s*\/?>/mg, "\n");
 
             modalEdit.modal("show");
           }
@@ -142,7 +128,7 @@ define(['app', '../js/forum-http-factory.js',
             if ($scope.unsafePost.message == '')
               return;
 
-
+            $scope.loading = true;
             $http.put('/api/v2014/discussions/posts/' + $scope.postId, $scope.unsafePost)
               .then(function(data) {
 
@@ -158,7 +144,9 @@ define(['app', '../js/forum-http-factory.js',
               }).catch(function(error) {
                 showError(error, 'update');
                 console.log(error);
-              })
+              }).finally(function(){
+                  $scope.loading = false;
+              });
 
           }
           $scope.askApprove = function() {
@@ -177,7 +165,7 @@ define(['app', '../js/forum-http-factory.js',
                   action: 'edit',
                   post: data.data
                 });
-
+                $scope.post = data.data;
                 modalApprove.modal("hide");
 
               }).catch(function(error) {
@@ -217,10 +205,10 @@ define(['app', '../js/forum-http-factory.js',
               $scope.errorMsg = "There was a error, please try again.";
           }
 
-          $scope.isDeleted = function(post) {
-
-            return post && !post.deletedOn;
-          }
+          // $scope.isDeleted = function(post) {
+          //
+          //   return post && !post.deletedOn;
+          // }
 
           $scope.scrollToPost = function(postId) {
             // if($location.$$hash)
