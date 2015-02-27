@@ -17,7 +17,7 @@
       </button>
       <button type="button" class="btn btn-default pull-right" data-toggle="modal" ng-click="editPost();" ng-show="post.security.canEdit"><i class="fa fa-edit"></i>
       </button>
-      <button type="button" class="btn btn-default pull-right" data-toggle="modal" ng-click="newPost();" ng-show="post.security.canPost"><i class="fa fa-reply"></i>
+      <button type="button" class="btn btn-default pull-right" data-toggle="modal" ng-click="newPost();" ng-show="post.security.canPost && !forum.closedOn"><i class="fa fa-reply"></i>
       </button>
     </div>
   </div>
