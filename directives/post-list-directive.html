@@ -14,7 +14,7 @@
   <div class="row" ng-show="forumPosts.length>0">
     <div class="col-lg-12">
       <div class="panel panel-default" ng-repeat="data in forumPosts | orderBy: postId:true" id="post_{{data.postId}}">
-        <div class="panel-heading"> <strong ng-bind-html="data.subject"></strong> [#{{data.postId}}]</div>
+        <div class="panel-heading" ng-hide="hideSubject"> <strong ng-bind-html="data.subject"></strong> [#{{data.postId}}]</div>
         <div class="panel-body">
           <div class="alert alert-info" role="alert" ng-show="!data.approved">Approval pending</div>
           <span ng-bind-html="data.message"></span>
