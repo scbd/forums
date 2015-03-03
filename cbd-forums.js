@@ -796,7 +796,7 @@ angular.module('cbd-forums', [])
                         $q.all([thread, threadPosts]).then(function(response) {
 
                                 $scope.forumPosts = response[1].data;
-                                if (!$scope.hideThread) {
+                                if ($scope.hideThread==undefined || $scope.hideThread=='false') {
                                     $scope.forumPosts.push(response[0].data);
                                 }
                                 $scope.forumPosts = $filter("orderBy")($scope.forumPosts, "['postId']");
@@ -864,7 +864,7 @@ angular.module('cbd-forums', [])
 
                     loadForum();
 
-                    $scope.$on("sortPosts", function(evt, data) {                        
+                    $scope.$on("sortPosts", function(evt, data) {
                         $scope.forumPosts = $filter("orderBy")($scope.forumPosts,  data.field ,data.reverse);
                     });
 
