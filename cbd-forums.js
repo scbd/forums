@@ -380,11 +380,12 @@ angular.module('cbd-forums', [])
             replace: true,
             transclude: false,
             scope: {
-                forumId: "=forumId",
-                threadId: "=threadId",
-                showDetails: "@showDetails",
-                type: "@type",
-                forumListUrl: "=forumListUrl"
+                forumId             : "=forumId",
+                threadId            : "=threadId",
+                showDetails         : "@showDetails",
+                type                : "@type",
+                forumListUrl        : "=forumListUrl",
+                showForumProperties : '&'
             },
             link: function($scope, $element, $attrs) {
 
@@ -407,7 +408,7 @@ angular.module('cbd-forums', [])
 
                                 $scope.forum = result[0].data;
                                 //if user is not watching forum check if watching thread.
-                                if (result[1].data.watch || $scope.type == 'forum') {
+                                if (result[1].data.watching || $scope.type == 'forum') {
                                     if ($scope.type != 'thread')
                                         $scope.forumWatch = result[1].data
                                 } else {
@@ -452,9 +453,9 @@ angular.module('cbd-forums', [])
                     $scope.startWatching = function() {
                         var watchDetails;
                         $scope.clearMessage();
-                        if ($scope.forumWatch && !$scope.forumWatch.watch)
+                        if ($scope.forumWatch && !$scope.forumWatch.watching)
                             watchDetails = $http.post('/api/v2014/discussions/forums/' + $scope.forumId + '/watch');
-                        else if ($scope.threadWatch && !$scope.threadWatch.watch)
+                        else if ($scope.threadWatch && !$scope.threadWatch.watching)
                             watchDetails = $http.post('/api/v2014/discussions/threads/' + $scope.threadId + '/watch');
                         $scope.isLoading = true;
                         if (watchDetails) {
@@ -478,9 +479,9 @@ angular.module('cbd-forums', [])
                         var watchDetails;
                         $scope.isLoading = true;
                         $scope.clearMessage();
-                        if ($scope.forumWatch && $scope.forumWatch.watch)
+                        if ($scope.forumWatch && $scope.forumWatch.watching)
                             watchDetails = $http.delete('/api/v2014/discussions/forums/' + $scope.forumId + '/watch');
-                        else if ($scope.threadWatch && $scope.threadWatch.watch)
+                        else if ($scope.threadWatch && $scope.threadWatch.watching)
                             watchDetails = $http.delete('/api/v2014/discussions/threads/' + $scope.threadId + '/watch');
 
                         if (watchDetails) {
@@ -513,6 +514,12 @@ angular.module('cbd-forums', [])
                         $scope.success = null;
                     }
 
+                     $scope.showProperties = function(){
+                         if($scope.showForumProperties && typeof $scope.showForumProperties === 'function'){
+                             return $scope.showForumProperties();
+                         }
+                         return false;
+                     }
                 }
             ]
         }
