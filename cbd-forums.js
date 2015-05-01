@@ -76,14 +76,14 @@ app.factory('commonJS', ['$rootScope', '$browser', function($scope, $browser) {
 
         this.isUserAuthenticated = function() {
 
-            if ($browser.cookies().authenticationToken)
+            if ($browser.cookies().authenticationToken && $browser.cookies().authenticationToken!= "undefined" && $browser.cookies().authenticationToken!= "null")
                 return true;
             else
                 return false;
         }
 
         this.loadForum = function(forumId) {
-            var forum = $http.get('/api/v2014/discussions/forums/' + $forumId);
+            var forum = $http.get('/api/v2014/discussions/forums/' + forumId);
             return $q.when(forum).then(function(result) {
                 return result.data;
             });
@@ -390,13 +390,13 @@ app.directive("forumDetails", [function() {
         link: function($scope, $element, $attrs) {
 
         },
-        controller: ["$scope", "forumHttp", "underscore", "$q", '$element',
-            function($scope, $http, _, $q, $element) {
+        controller: ["$scope", "forumHttp", "underscore", "$q", '$element','commonJS',
+            function($scope, $http, _, $q, $element, commonJS) {
 
                 function loadForum() {
 
                     $scope.clearMessage();
-                    if ($scope.showDetails && (!$scope.forum || $scope.forum.forumId != $scope.forumId)) {
+                    if (commonJS.isUserAuthenticated && $scope.showDetails && (!$scope.forum || $scope.forum.forumId != $scope.forumId)) {
                         $scope.isLoading = true;
                         $scope.forumWatch = null;
                         var forum = $http.get('/api/v2014/discussions/forums/' + $scope.forumId);
@@ -796,7 +796,8 @@ app.directive("posts", [function() {
 
                 }
                 $scope.loadPosts = function(threadId) {
-
+                    if(!commonJS.isUserAuthenticated)
+                        return;
                     var thread = $http.get('/api/v2014/discussions/posts/' + threadId);
                     var threadPosts = $http.get('/api/v2014/discussions/threads/' + threadId + '/posts');
 
@@ -827,7 +828,7 @@ app.directive("posts", [function() {
                             $element.find('#msg').show('slow');
                         });
 
-                }
+                };
 
                 $scope.$on("postUpdated", function(evt, data) {
                     if (data && data.action == 'new') {
@@ -862,6 +863,8 @@ app.directive("posts", [function() {
                 })
 
                 function loadForum() {
+                     if(!commonJS.isUserAuthenticated)
+                        return;
                     if ($scope.forumId) {
                         var forum = $http.get('/api/v2014/discussions/forums/' + $scope.forumId);
                         $q.when(forum).then(function(result) {
@@ -895,8 +898,8 @@ app.directive("forumThreads", [function() {
         link: function($scope, $element, $attrs) {
 
         },
-        controller: ["$scope", "forumHttp", "$q", '$element', '$location', "$element",
-            function($scope, $http, $q, $element, $location, $element) {
+        controller: ["$scope", "forumHttp", "$q", '$element', '$location', "$element",'commonJS',
+            function($scope, $http, $q, $element, $location, $element, commonJS) {
 
                 var modalDelete = $element.find("#deleteDialog");
                 //   if ($location.search().forumid) {
@@ -913,15 +916,17 @@ app.directive("forumThreads", [function() {
                     return;
                 }
 
-                var forumThreads = $http.get('/api/v2014/discussions/forums/' + $scope.forumId + '/threads');
+                 if(commonJS.isUserAuthenticated){
+                    var forumThreads = $http.get('/api/v2014/discussions/forums/' + $scope.forumId + '/threads');
 
-                $q.when(forumThreads).then(function(response) {
+                    $q.when(forumThreads).then(function(response) {
 
-                    $scope.threads = response.data;
+                        $scope.threads = response.data;
 
-                }).catch(function(error) {
-                    handleError(error, 'list');
-                });
+                    }).catch(function(error) {
+                        handleError(error, 'list');
+                    });
+                 }
 
                 $scope.$on("threadCreated", function(evt, data) {
                     console.log(data);
