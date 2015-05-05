@@ -44,9 +44,9 @@
         <!-- </div>
         <div class="col-sm-4 col-md-4 col-lg-4 pull-right"> -->
             <div style="padding:0px 5px 0px 5px" class="pull-right">
-                <button type="button" class="btn btn-primary" ng-show="forumWatch.userId > 1 && !forum.closedOn && (forumWatch.watching || threadWatch.watching)" ng-click="stopWatching()">Stop watching {{type}}
+                <button type="button" class="btn btn-primary" ng-show="((forumWatch||threadWatch).user.userID > 1) && !forum.closedOn && (forumWatch.watching || threadWatch.watching)" ng-click="stopWatching()">Stop watching {{type}}
                 </button>
-                <button type="button" class="btn btn-primary" ng-show="forumWatch.userId > 1 && !forum.closedOn  && ((forumWatch && !forumWatch.watching) || (threadWatch && !threadWatch.watching))" ng-click="startWatching()">Watch {{type}}
+                <button type="button" class="btn btn-primary" ng-show="((forumWatch||threadWatch).user.userID > 1) && !forum.closedOn  && ((forumWatch && !forumWatch.watching) || (threadWatch && !threadWatch.watching))" ng-click="startWatching()">Watch {{type}}
                 </button>
             </div>
             <div style="padding:0px 5px 0px 5px" class="pull-right">

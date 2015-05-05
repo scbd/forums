@@ -402,17 +402,17 @@ app.directive("forumDetails", [function() {
                         var forum = $http.get('/api/v2014/discussions/forums/' + $scope.forumId);
 
                         var forumWatchQuery = $http.get('/api/v2014/discussions/forums/' + $scope.forumId + '/watch');
-                        var threadWatchQuery = $http.get('/api/v2014/discussions/threads/' + $scope.threadId + '/watch');
-
+                        
                         $q.all([forum, forumWatchQuery]).then(function(result) {
 
                             $scope.forum = result[0].data;
                             //if user is not watching forum check if watching thread.
                             if (result[1].data.watching || $scope.type == 'forum') {
                                 if ($scope.type != 'thread')
-                                    $scope.forumWatch = result[1].data
+                                    $scope.forumWatch = result[1].data;
                             } else {
                                 if ($scope.threadId)
+                                    var threadWatchQuery = $http.get('/api/v2014/discussions/threads/' + $scope.threadId + '/watch');
                                     $q.when(threadWatchQuery).then(function(result) {
                                         $scope.threadWatch = result.data;
                                     });
@@ -902,19 +902,19 @@ app.directive("forumThreads", [function() {
             function($scope, $http, $q, $element, $location, $element, commonJS) {
 
                 var modalDelete = $element.find("#deleteDialog");
-                //   if ($location.search().forumid) {
-                //       $scope.forumId = $location.search().forumid;
-                //       $scope.threadId = $location.search().threadid;
-                //   }
+//                   if ($location.search().forumid) {
+//                       $scope.forumId = $location.search().forumid;
+//                       $scope.threadId = $location.search().threadid;
+//                   }
 
                 if (!$scope.forumId) {
                     $scope.error = "Forum id not specified.";
                     return;
                 }
-                if ($scope.forumId && $scope.threadId) {
-                    $location.path('/forums/iac/' + $scope.threadId);
-                    return;
-                }
+//                if ($scope.forumId && $scope.threadId) {
+//                    $location.path($scope.postUrl + '/' + $scope.threadId);
+//                    return;
+//                }
 
                  if(commonJS.isUserAuthenticated){
                     var forumThreads = $http.get('/api/v2014/discussions/forums/' + $scope.forumId + '/threads');
