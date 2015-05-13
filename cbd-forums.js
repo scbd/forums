@@ -1,69 +1,10 @@
 var app = angular.module('cbd-forums', [])
-app.factory('forumHttp', ['$http', "$browser", '$rootScope', function($http, $browser, $rootScope) {
-
-    function addAuthentication(config) {
-
-        if (!config) config = {};
-        if (!config.headers) config.headers = {};
-
-        if ($browser.cookies().authenticationToken) config.headers.Authorization = "Ticket " + $browser.cookies().authenticationToken;
-        else config.headers.Authorization = undefined;
-
-        return config;
-    }
-
-    function forumHttp(config) {
-        return $http(addAuthentication(config));
-    }
-
-    forumHttp["get"] = function(url, config) {
-        return forumHttp(angular.extend(config || {}, {
-            'method': "GET",
-            'url': url
-        }));
-    };
-    forumHttp["head"] = function(url, config) {
-        return forumHttp(angular.extend(config || {}, {
-            'method': "HEAD",
-            'url': url
-        }));
-    };
-    forumHttp["delete"] = function(url, config) {
-        return forumHttp(angular.extend(config || {}, {
-            'method': "DELETE",
-            'url': url
-        }));
-    };
-    forumHttp["jsonp"] = function(url, config) {
-        return forumHttp(angular.extend(config || {}, {
-            'method': "JSONP",
-            'url': url
-        }));
-    };
-    forumHttp["post"] = function(url, data, config) {
-        return forumHttp(angular.extend(config || {}, {
-            'method': "POST",
-            'url': url,
-            'data': data
-        }));
-    };
-    forumHttp["put"] = function(url, data, config) {
-        return forumHttp(angular.extend(config || {}, {
-            'method': "PUT",
-            'url': url,
-            'data': data
-        }));
-    };
-
-    return forumHttp;
-
-}])
-app.factory('commonJS', ['$rootScope', '$browser', function($scope, $browser) {
+app.factory('forumUtil', ['$rootScope', '$browser', function($rootScope, $browser) {
 
     return new function() {
 
         this.safeApply = function(fn) {
-            var phase = $scope.$root.$$phase;
+            var phase = $rootScope.$root.$$phase;
 
             if (phase == '$apply' || phase == '$digest') {
                 if (fn && (typeof(fn) === 'function')) {
@@ -75,11 +16,8 @@ app.factory('commonJS', ['$rootScope', '$browser', function($scope, $browser) {
         };
 
         this.isUserAuthenticated = function() {
-
-            if ($browser.cookies().authenticationToken && $browser.cookies().authenticationToken!= "undefined" && $browser.cookies().authenticationToken!= "null")
-                return true;
-            else
-                return false;
+            console.log($rootScope.user.isAuthenticated);
+            return $rootScope.user && $rootScope.user.isAuthenticated;
         }
 
         this.loadForum = function(forumId) {
@@ -152,7 +90,7 @@ app.directive('kmUpload', function($q) {
                 $scope.editor.mimeTypes = $attr.mimeTypes.split(";");
 
         },
-        controller: ["$scope", "forumHttp", "$filter", function($scope, $http, $filter) {
+        controller: ["$scope", "$http", "$filter", function($scope, $http, $filter) {
             $scope.editor = {};
 
             //==============================
@@ -390,19 +328,19 @@ app.directive("forumDetails", [function() {
         link: function($scope, $element, $attrs) {
 
         },
-        controller: ["$scope", "forumHttp", "underscore", "$q", '$element','commonJS',
-            function($scope, $http, _, $q, $element, commonJS) {
+        controller: ["$scope", "$http", "underscore", "$q", '$element','forumUtil',
+            function($scope, $http, _, $q, $element, forumUtil) {
 
                 function loadForum() {
 
                     $scope.clearMessage();
-                    if (commonJS.isUserAuthenticated && $scope.showDetails && (!$scope.forum || $scope.forum.forumId != $scope.forumId)) {
+                    if (forumUtil.isUserAuthenticated() && $scope.showDetails && (!$scope.forum || $scope.forum.forumId != $scope.forumId)) {
                         $scope.isLoading = true;
                         $scope.forumWatch = null;
                         var forum = $http.get('/api/v2014/discussions/forums/' + $scope.forumId);
 
                         var forumWatchQuery = $http.get('/api/v2014/discussions/forums/' + $scope.forumId + '/watch');
-                        
+
                         $q.all([forum, forumWatchQuery]).then(function(result) {
 
                             $scope.forum = result[0].data;
@@ -544,7 +482,7 @@ app.directive("forumPost", [function() {
         link: function($scope, $element, $attrs) {
 
         },
-        controller: ["$scope", "forumHttp", "$window", "$filter", "underscore", "$q", '$element', '$location', "$timeout", "$element", "$browser", '$rootScope',
+        controller: ["$scope", "$http", "$window", "$filter", "underscore", "$q", '$element', '$location', "$timeout", "$element", "$browser", '$rootScope',
             function($scope, $http, $window, $filter, _, $q, $element, $location, $timeout, $element, $browser, $rootScope) {
 
 
@@ -765,8 +703,8 @@ app.directive("posts", [function() {
         link: function($scope, $element, $attrs) {
 
         },
-        controller: ["$scope", "forumHttp", "underscore", "$q", "$filter", "$timeout", "$location", "$routeParams", "$timeout", "commonJS", "$element", "$rootScope",
-            function($scope, $http, _, $q, $filter, $timeout, $location, $routeParams, $timeout, commonJS, $element, $rootScope) {
+        controller: ["$scope", "$http", "underscore", "$q", "$filter", "$timeout", "$location", "$routeParams", "$timeout", "forumUtil", "$element", "$rootScope",
+            function($scope, $http, _, $q, $filter, $timeout, $location, $routeParams, $timeout, forumUtil, $element, $rootScope) {
 
 
                 if ($routeParams.threadId) {
@@ -796,7 +734,7 @@ app.directive("posts", [function() {
 
                 }
                 $scope.loadPosts = function(threadId) {
-                    if(!commonJS.isUserAuthenticated)
+                    if(!forumUtil.isUserAuthenticated())
                         return;
                     var thread = $http.get('/api/v2014/discussions/posts/' + threadId);
                     var threadPosts = $http.get('/api/v2014/discussions/threads/' + threadId + '/posts');
@@ -863,7 +801,7 @@ app.directive("posts", [function() {
                 })
 
                 function loadForum() {
-                     if(!commonJS.isUserAuthenticated)
+                     if(!forumUtil.isUserAuthenticated())
                         return;
                     if ($scope.forumId) {
                         var forum = $http.get('/api/v2014/discussions/forums/' + $scope.forumId);
@@ -898,8 +836,8 @@ app.directive("forumThreads", [function() {
         link: function($scope, $element, $attrs) {
 
         },
-        controller: ["$scope", "forumHttp", "$q", '$element', '$location', "$element",'commonJS',
-            function($scope, $http, $q, $element, $location, $element, commonJS) {
+        controller: ["$scope", "$http", "$q", '$element', '$location', "$element",'forumUtil',
+            function($scope, $http, $q, $element, $location, $element, forumUtil) {
 
                 var modalDelete = $element.find("#deleteDialog");
 //                   if ($location.search().forumid) {
@@ -916,7 +854,7 @@ app.directive("forumThreads", [function() {
 //                    return;
 //                }
 
-                 if(commonJS.isUserAuthenticated){
+                 if(forumUtil.isUserAuthenticated()){
                     var forumThreads = $http.get('/api/v2014/discussions/forums/' + $scope.forumId + '/threads');
 
                     $q.when(forumThreads).then(function(response) {
