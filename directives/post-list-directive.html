@@ -17,7 +17,7 @@
         <div class="panel-heading" ng-hide="hideSubject"> <strong ng-bind-html="data.subject"></strong> [#{{data.postId}}]</div>
         <div class="panel-body">
           <div class="alert alert-info" role="alert" ng-show="!data.approved">Approval pending</div>
-          <span ng-bind-html="data.message"></span>
+          <span ng-bind-html="data.htmlMessage"></span>
         </br>  </br>
           <div id="postAttachments">
             <table class="table table-hover" ng-show="data.attachments">

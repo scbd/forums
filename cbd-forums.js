@@ -573,7 +573,7 @@ app.directive("forumPost", [function() {
                     $scope.errorMsg = '';
                     $scope.operation = 'edit'
                     $scope.unsafePost = _.clone($scope.post);
-                    $scope.unsafePost.message.en = $scope.post.message.replace(/<br\s*\/?>/mg, "\n");
+                    $scope.unsafePost.message = $scope.post.message.replace(/<br\s*\/?>/mg, "\n");
 
                     modalEdit.modal("show");
                 }
@@ -657,8 +657,17 @@ app.directive("forumPost", [function() {
                 }
 
                 function showError(error, type) {
-                    if (error.status == 403 || error.status == 401 || error.status == 400 || error.data.message || error.data.Message)
-                        $scope.errorMsg = 'Cannot ' + type + ', ' + (error.data.code ? (error.data.code + ': ') : '') + (error.data.message || error.data.Message);
+                    if (error.status == 403 || error.status == 401 || error.status == 400 || error.data){
+                        if((error.data.message || error.data.Message))
+                            $scope.errorMsg = 'Cannot ' + type + ', ' + (error.data.code ? (error.data.code + ': ') : '') + (error.data.message || error.data.Message);
+                        else{
+                            var errorMessage='';
+                            angular.forEach(error.data, function(error){
+                                errorMessage += ',' + error.message;
+                            });
+                            $scope.errorMsg = errorMessage;
+                        }
+                    }
                     else
                         $scope.errorMsg = "There was a error, please try again.";
                 }
