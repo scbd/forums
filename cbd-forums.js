@@ -1,3 +1,8 @@
+
+//v1 
+
+
+
 var app = angular.module('cbd-forums', [])
 app.factory('forumUtil', ['$rootScope', '$browser', function($rootScope, $browser) {
 
@@ -529,7 +534,7 @@ app.directive("forumPost", [function() {
                     $scope.unsafePost = {};
                     $scope.errorMsg = '';
                     $scope.operation = 'new'
-                    $scope.unsafePost.subject = $scope.post.subject;
+                    $scope.unsafePost.subject = "Re: " + $scope.post.subject;
 
                     modalEdit.modal("show");
                 }
@@ -678,7 +683,7 @@ app.directive("forumPost", [function() {
                 //   return post && !post.deletedOn;
                 // }
 
-                $scope.scrollToPost = function(postId) {
+               v= function(postId) {
                     // if($location.$$hash)
                     //   $location.$$hash = postId
                     var postTop = $('#post_' + postId).offset().top - 50;
@@ -716,11 +721,14 @@ app.directive("posts", [function() {
         controller: ["$scope", "$http", "underscore", "$q", "$filter", "$timeout", "$location", "$routeParams", "$timeout", "forumUtil", "$element", "$rootScope",
             function($scope, $http, _, $q, $filter, $timeout, $location, $routeParams, $timeout, forumUtil, $element, $rootScope) {
 
+                $scope.viewPostsBy = 'date';
+                $scope.threadId = null;
 
                 if ($routeParams.threadId) {
                     $scope.threadId = $routeParams.threadId;
                 }
 
+                //-------------------------------------------------------
                 $scope.openAttachment = function(attachment) {
                     // var date = new Date();
                     // date.setTime(date.getTime() + (30 * 1000));
@@ -743,19 +751,23 @@ app.directive("posts", [function() {
                     });
 
                 }
+
+                //-------------------------------------------------------
                 $scope.loadPosts = function(threadId) {
+                    
                     if(!forumUtil.isUserAuthenticated())
                         return;
+
                     var thread = $http.get('/api/v2014/discussions/posts/' + threadId);
                     var threadPosts = $http.get('/api/v2014/discussions/threads/' + threadId + '/posts');
 
                     $q.all([thread, threadPosts]).then(function(response) {
-
-                            $scope.forumPosts = response[1].data;
+                        $scope.forumPosts = response[1].data;
                             if ($scope.hideThread == undefined || $scope.hideThread == 'false') {
                                 $scope.forumPosts.push(response[0].data);
                             }
                             $scope.forumPosts = $filter("orderBy")($scope.forumPosts, "['postId']");
+                            makeTree();
                             $scope.onPostsLoad({
                                 posts: $scope.forumPosts
                             });
@@ -775,15 +787,64 @@ app.directive("posts", [function() {
                                 $scope.error = "There was a error, please try again."
                             $element.find('#msg').show('slow');
                         });
-
                 };
 
+                //-------------------------------------------------------
+                //  function addtoTree(data, topnode) {
+
+                //     if (data.parentId === topnode.postId) {
+                //         topnode.children.push(data.post);
+                //         return;
+                //     }
+                //     else if (topnode.children.length > 0 ){
+
+                //         for (i = 0; i < topnode.children.length; i += 1) {
+                //             addtoTree (data, topnode.children[i])
+                //         }
+                //         return;
+                //     }
+                    
+                //     return;
+                //  }
+                //-------------------------------------------------------
+                function findParentNode(data, topnode) {
+
+                    var stack = [], node, ii;
+                    stack.push(topnode);
+
+                    while (stack.length > 0) {
+                        node = stack.pop();
+                        if (data.parentId === node.postId) {
+                            return node;
+                       
+                        } else if (node.children && node.children.length) {
+                            for (ii = 0; ii < node.children.length; ii += 1) {
+                                stack.push(node.children[ii]);
+                            }
+                        }
+                    }
+                    return null;
+                }
+
+                //-------------------------------------------------------
                 $scope.$on("postUpdated", function(evt, data) {
                     if (data && data.action == 'new') {
                         $scope.forumPosts.push(data.post);
+
+                        var node = findParentNode(data.post, $scope.forumTree[0]);
+                        if(!node.children) 
+                            node.children = [];
+                        node.children.unshift(data.post);
+
                     } else if (data && data.action == 'delete') {
                         $timeout(function() {
                             $scope.forumPosts.splice($scope.forumPosts.indexOf(data.post), 1);
+
+                            var node = findParentNode(data.post, $scope.forumTree[0]);
+                                for (i=0; i < node.children.length; i++)   {
+                                    if(data.post.postId === node.children[i].postId)
+                                    node.children.splice(i, 1);
+                                }
                         }, 500)
                     }
                     $scope.success = true;
@@ -791,25 +852,29 @@ app.directive("posts", [function() {
 
                 });
 
+                //-------------------------------------------------------
                 $scope.isDeleted = function(post) {
-
                     return post && !post.deletedOn;
                 }
 
+                //-------------------------------------------------------
                 $scope.closeMessage = function() {
                     $element.find('#msg').hide('slow');
                     $scope.error = '';
                     $scope.success = null;
                 }
 
-                if ($scope.threadId)
-                    $scope.loadPosts($scope.threadId);
+                //-------------------------------------------------------
+               if ($scope.threadId)
+                $scope.loadPosts($scope.threadId)
+                   
+                // //-------------------------------------------------------
+                // $scope.$watch('threadId', function(newValue) {
+                //     if (newValue)
+                //         $scope.loadPosts($scope.threadId);
+                // })
 
-                $scope.$watch('threadId', function(newValue) {
-                    if (newValue)
-                        $scope.loadPosts($scope.threadId);
-                })
-
+                //-------------------------------------------------------
                 function loadForum() {
                      if(!forumUtil.isUserAuthenticated())
                         return;
@@ -824,9 +889,33 @@ app.directive("posts", [function() {
 
                 loadForum();
 
+                //-------------------------------------------------------
                 $scope.$on("sortPosts", function(evt, data) {
                     $scope.forumPosts = $filter("orderBy")($scope.forumPosts, data.field, data.reverse);
                 });
+
+                //-------------------------------------------------------
+                $scope.forumTree;
+                function makeTree() {
+                    $scope.forumTree = list_to_tree($scope.forumPosts)
+                }
+
+                function list_to_tree(list) {
+                    var map = {}, node, roots = [], i;
+                    for (i = 0; i < list.length; i += 1) {
+                        map[list[i].postId] = i; 
+                        list[i].children = []; 
+                    }
+                    for (i = 0; i < list.length; i += 1) {
+                        node = list[i];
+                        if (node.parentId !== node.postId) {
+                            list[map[node.parentId]].children.push(node);
+                        } else {
+                            roots.push(node);
+                        }
+                    }
+                    return roots;
+                }
 
             }
         ]

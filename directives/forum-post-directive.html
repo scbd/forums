@@ -1,15 +1,14 @@
-<div>
-
+<div style="display:inline;"> 
   <div class="row" ng-show="type=='post'">
-    <div class="col-sm-10 col-ldm-10 col-md-10">
-      <!-- <div class="well1" style="padding-top: 5px;min-height: 50px;"> -->
-      <div class="pull-left1" style="font-weight:bold">posted by {{post.createdBy}} on {{post.createdOn| date:'medium'}}
-      </div>
-      <span ng-show="post.parentId!=post.postId">
-          in response to: <span ng-click="scrollToPost(post.parentId)" style="cursor:pointer;text-decoration: underline;color: #428bca;">#{{post.parentId}}</span>
+    <div class="col-sm-12">
+      <div class="color-grey pull-left">
+        Posted by:
+        <span class="bold"> {{post.createdBy}}</span> 
+        <span ng-show="post.parentId!=post.postId">
+          in response to: <a ng-click="scrollToPost(post.parentId)" style="cursor:pointer;text-decoration: underline; color: #428bca;" class="bold">#{{post.parentId}}</a>
       </span>
-    </div>
-    <div class="col-sm-2 col-ldm-2 col-md-2 pull-right">
+      </div>
+      <div>
 
       <button type="button" class="btn btn-default pull-right" ng-click="dialogType='Approve';askApprove()" data-toggle="modal" ng-show="post.security.canApprove"><i class="fa fa-check"></i>
       </button>
@@ -21,8 +20,10 @@
       </button>
     </div>
   </div>
-  <button type="button" ng-show="type=='thread'" class="btn btn-primary" data-toggle="modal" ng-click="newThread();">Create a new thread
-  </button>
+  </div>
+
+  <a type="button" ng-show="type=='thread'" style="display:inline-block;" class="btn btn-primary" data-toggle="modal" ng-click="newThread();">Create a new thread
+  </a>
 
   <form name="editForm" id="editForm" class="modal fade" data-backdrop="static" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">

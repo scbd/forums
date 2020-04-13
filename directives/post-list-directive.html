@@ -1,4 +1,23 @@
 <div>
+  <div ng-show="forumPosts" class="dropdown pull-right">
+    <button class="btn btn-default dropdown-toggle type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+      <b>View posts: </b>
+        <span ng-show="viewPostsBy === 'tree'" >by reply hierarchy</span>
+        <span ng-show="viewPostsBy === 'date'" >in chronological order</span>
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+      <li><a href="#" ng-click="viewPostsBy = 'tree';" >View by reply hierarchy</a></li>
+      <li><a  href="#" ng-click="viewPostsBy = 'date';">View in chronological order</a></li>
+    </ul>
+  </div>
+  <br>
+  <div class="clearfix"></div>
+  <div style="background-color:#ccc;" >
+
+<div ng-if="!forumPosts" class="text-center">
+  <i class="fa fa-spinner fa-spin" style="font-size: 32px;padding:30px;color:white;" />
+</div>
 
   <div class="row" id="msg" style="display:none">
     <div class="col-lg-12">
@@ -10,40 +29,65 @@
         <span ng-show="error">{{error}}</span>
       </div>
     </div>
+  </div>  
+
+  <div ng-repeat="data in forumPosts | orderBy: 'postId' "  ng-show="viewPostsBy === 'date'" >
+    <div ng-include="'post.html'" style="padding:10px;" ></div>
+  </div> 
+
+<div ng-repeat="data in forumTree " ng-show="viewPostsBy === 'tree'"  >
+    <div ng-include="'post.html'" style="padding:10px;" ></div>
+    <div style="margin-left:20px;background-color:#ccc;" ng-if="data.children.length" ng-include="'items.html'"></div>
+ </div>
+
+<script type="text/ng-template" id="items.html">
+  <div ng-repeat="data in data.children " >
+      <div ng-include="'post.html'" style="padding:10px;" ></div>
+      <div  style="margin-left:20px;background-color:#bbb);
+      " ng-if="data.children.length" ng-include="'items.html'"></div>
   </div>
-  <div class="row" ng-show="forumPosts.length>0">
-    <div class="col-lg-12">
-      <div class="panel panel-default" ng-repeat="data in forumPosts | orderBy: postId:true" id="post_{{data.postId}}">
-        <div class="panel-heading" ng-hide="hideSubject"> <strong ng-bind-html="data.subject"></strong> [#{{data.postId}}]</div>
+</script>
+
+
+
+
+<script type="text/ng-template" id="post.html">
+      <span class="color-white bold">
+        {{data.updatedOn | date:'MMMM d, y - h:mm:ss a'}} 
+      </span>
+      <div class="panel panel-default" id="post_{{data.postId}}" >
+        <div ng-class="{'bg-green': data.postId == data.threadId}" class="panel-heading " ng-hide="hideSubject">
+          <h4 style="padding:0;margin:0;">
+            <span ng-if="data.postId == data.threadId" class="pull-right color-white">Initial post </span>
+            <span ng-if="data.postId != data.threadId" class="pull-right color-litegrey" > Response to #{{data.parentId}} </span>
+            <span ng-if="data.postId == data.threadId" class="color-white">#{{data.postId}}</span>
+            <span ng-if="data.postId != data.threadId" class="color-black"> #{{data.postId}} </span>
+          </h4>
+        </div>
         <div class="panel-body">
+          <h3 ng-bind-html="data.subject"></h3>
           <div class="alert alert-info" role="alert" ng-show="!data.approved">Approval pending</div>
           <span ng-bind-html="data.htmlMessage"></span>
-        </br>  </br>
+          
           <div id="postAttachments">
             <table class="table table-hover" ng-show="data.attachments">
               <tr ng-repeat="attachment in data.attachments| filter:isDeleted">
                 <td>
                   <!-- /api/v2014/discussions/attachments/{{attachment.attachmentId}}/ -->
-                  <a ng-href="#" ng-click="openAttachment(attachment)" ng-disabled="isLoadingDocument==attachment.attachmentId">{{attachment.name}}</a>
+                  <a ng-href="#" ng-click="openAttachment(attachment)"
+                    ng-disabled="isLoadingDocument==attachment.attachmentId">{{attachment.name}}</a>
                   <i class="fa fa-spinner fa-spin pull-right" ng-show="isLoadingDocument==attachment.attachmentId">
-                  </td>
-                </tr>
-              </table>
+                </td>
+              </tr>
+            </table>
           </div>
         </div>
-        <div class="panel-footer">
-          <div forum-post post="data" thread-id="data.threadId" post-id="data.postId" type="post" title="Add new Post" forum="forum" />
-        </div>
+      <div class="panel-footer">
+        <div forum-post post="data" thread-id="data.threadId" post-id="data.postId" type="post" title="Add new Post"
+          forum="forum" ></div>
       </div>
-      <!-- <div class="well" ng-repeat="data in forumPosts | orderBy: forumPostID:true" style="background-color: #fff;" id="post_{{data.forumPostID}}">
+    </div> <!-- end panel -->
+</script>
 
-
-        <hr style="margin-top: 0px; margin-bottom: 0px;" /> </br>
-
-        </br>
-        </br>
-
-      </div> -->
-    </div>
-  </div>
+</div>
 </div>

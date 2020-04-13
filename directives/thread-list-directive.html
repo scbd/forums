@@ -10,13 +10,42 @@
       </div>
     </div>
   </div>
-  <div class="row" ng-show="threads.length>0">
+
+
+  <div class="list-group" ng-show="threads.length>0">
+
+    <a ng-href="{{postUrl}}/{{thread.threadId}}" class="list-group-item" ng-repeat="thread in threads | orderBy:'createdOn'" >
+      <div class="row">
+        <div class="col-xs-8">
+          <h3 class="list-group-item-heading"> {{thread.subject}} </h3>
+          <p class="list-group-item-text">
+            <b>Started by:</b> {{thread.createdBy}}
+            <br> on {{thread.createdOn| date:'medium'}}
+          </p>
+        </div>
+        <div class="col-xs-4">
+          <strong>Comments: <span class="badge"> {{thread.replies}}</span></strong>
+          <p class="list-group-item-text">
+            <b>Last comment by:</b> {{thread.updatedBy}}
+            <br>on {{thread.updatedOn| date:'medium'}}
+          </p>
+        </div>
+      </div>
+      </a>
+
+    </div>
+    <!-- <button type="button" class="pull-right btn btn-default" data-toggle="modal" ng-click="askDelete(thread)" ng-show="thread.security.canDelete">
+      <i class="fa fa-trash-o"></i>
+    </button> -->
+
+
+  <!-- <div class="row " ng-show="threads.length>0">
     <div class="col-lg-12 well">
-      <div style="border-bottom:solid 1px #666;padding:10px 0px 10px 0px;" ng-repeat="thread in threads">
+      <div style="border-bottom:solid 1px #ddd;padding:10px 0px 10px 0px;" ng-repeat="thread in threads">
         <div class="row">
           <div class="col-lg-6">
             <a ng-href="{{postUrl}}/{{thread.threadId}}">{{thread.subject | limitTo:100}}</a>
-            <div>posted by {{thread.createdBy}} on {{thread.createdOn| date:'medium'}}</div>
+            <div><b>Started by:</b> {{thread.createdBy}} on {{thread.createdOn| date:'medium'}}</div>
           </div>
           <div class="col-lg-1">
             {{thread.replies}}</br>
@@ -33,7 +62,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 
   <div id="deleteDialog" class="modal fade" data-backdrop="static">
     <div class="modal-dialog">

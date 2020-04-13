@@ -1,4 +1,6 @@
 <div>
+
+
     <div class="row" id="msg" style="display:none">
         <div class="col-lg-12">
             <div class="alert" ng-class="{'alert-success':success, 'alert-danger':error}">
@@ -12,48 +14,50 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-sm-12">
-            <span ng-show="isLoading">
-                loading <i class="fa fa-spinner fa-spin" />
-            </span>
-            <span ng-show="forum">
-                <h1>Welcome to {{forum.title|lstring}}</h1>
-            </span>
-            <span ng-hide="type=='forum'">
-                <a ng-href="{{forumListUrl}}">Back to thread list</a>
-            </span>
+    <div class="jumbotron  bg-white">
+        <span class="pull-left small color-green">DISCUSSION FORUM</span>
+        
+        <h1 ng-show="forum">
+            {{forum.title|lstring}}
+        </h1>
+        <span ng-hide="type=='forum'">
+            <a class="btn btn-default" ng-href="{{forumListUrl}}">Back to thread list</a>
+        </span>
+        <p ng-show="forumWatch.watching || threadWatch.watching">
+            You are currently watching this {{type}}. <br>
+            All posts will be sent to your registered email address at:
+            <strong>{{forumWatch.user.email||threadWatch.user.email}}</strong>
+        </p>
+        <p ng-show="forum.closedOn && type=='post'">
+            <i class="fa fa-lock"></i> Forum closed. No more comments will be accepted on this forum.
+        </p>
+
+        <div style="display: inline;">
+
+            <div forum-post ng-show="forum.security.canPost && type=='forum' && !forum.closedOn"
+                forum-id="forum.forumId" type="thread" title="Add new thread"> </div>
+
+            <a  type="button" class="btn btn-primary"
+                ng-show="((forumWatch||threadWatch).user.userID > 1) && !forum.closedOn && (forumWatch.watching || threadWatch.watching)"
+                ng-click="stopWatching()">Stop watching {{type}}
+            </a>
+
+            <a type="button" class="btn btn-primary" 
+                ng-show="((forumWatch||threadWatch).user.userID > 1) && !forum.closedOn  && ((forumWatch && !forumWatch.watching) || (threadWatch && !threadWatch.watching))"
+                ng-click="startWatching()">Watch {{type}}
+            </a>
+
+            <a class="btn btn-default" 
+                ng-href="http://bch.cbd.int/cms/ui/forums/management/forummanagement.aspx?forumid={{forum.forumId}}&locale=en"
+                class="btn btn-primary pull-right" ng-show="type=='forum' && forum && showProperties()">Forum properties
+            </a>
+
         </div>
+
     </div>
-    <hr style="border:solid 1px brown" />
-    <div class="row">
-        <div class="col-sm-12">
-            <span ng-show="forumWatch.watching || threadWatch.watching">
-                You are currently watching this {{type}}. All posts will be sent to your registered email address at:
-                <strong>{{forumWatch.user.email||threadWatch.user.email}}</strong>
-            </span>
-            <span ng-show="forum.closedOn && type=='post'">
-                <i class="fa fa-lock"></i> Forum closed. No more comments will be accepted on this forum.
-            </span>
-        </div>
+
+    <div ng-show="isLoading">
+        loading <i class="fa fa-spinner fa-spin" />
     </div>
-    </br>
-    <div class="row">
-        <div class="col-sm-12 col-md-12 col-lg-12 pull-right">
-            <div forum-post ng-show="forum.security.canPost && type=='forum' && !forum.closedOn" forum-id="forum.forumId" type="thread" title="Add new thread" />
-        <!-- </div>
-        <div class="col-sm-4 col-md-4 col-lg-4 pull-right"> -->
-            <div style="padding:0px 5px 0px 5px" class="pull-right">
-                <button type="button" class="btn btn-primary" ng-show="((forumWatch||threadWatch).user.userID > 1) && !forum.closedOn && (forumWatch.watching || threadWatch.watching)" ng-click="stopWatching()">Stop watching {{type}}
-                </button>
-                <button type="button" class="btn btn-primary" ng-show="((forumWatch||threadWatch).user.userID > 1) && !forum.closedOn  && ((forumWatch && !forumWatch.watching) || (threadWatch && !threadWatch.watching))" ng-click="startWatching()">Watch {{type}}
-                </button>
-            </div>
-            <div style="padding:0px 5px 0px 5px" class="pull-right">
-                <a ng-href="http://bch.cbd.int/cms/ui/forums/management/forummanagement.aspx?forumid={{forum.forumId}}&locale=en" class="btn btn-primary pull-right"
-                 ng-show="type=='forum' && forum && showProperties()">Forum properties
-                </a>
-            </div>
-        </div>
-    </div>
+
 </div>
